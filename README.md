@@ -22,7 +22,7 @@ Build a professional computer repair shop website with:
 - Customer testimonials
 - Contact and location information
 
-**Live Demo**: [TechFix Pro](https://techfix-pro.netlify.app/)
+**Live Demo**: [TechFix Pro](https://techrepair.netlify.app/)
 
 ---
 
