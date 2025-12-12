@@ -1,0 +1,239 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaPhone, FaMapMarkerAlt, FaClock, FaEnvelope } from "react-icons/fa";
+
+const ContactForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Contact form data:", data);
+    setIsSubmitting(false);
+    alert("Thank you for your message! We'll get back to you within 24 hours.");
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Contact Information */}
+      <div className="lg:col-span-1 space-y-6">
+        <div className="card bg-base-100 shadow-lg">
+          <div className="card-body">
+            <h3 className="card-title mb-4">Get In Touch</h3>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <FaPhone className="text-primary text-xl" />
+                <div>
+                  <p className="font-semibold">Phone</p>
+                  <p className="text-gray-600">(555) 123-TECH</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <FaEnvelope className="text-primary text-xl" />
+                <div>
+                  <p className="font-semibold">Email</p>
+                  <p className="text-gray-600">support@techfixpro.com</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <FaMapMarkerAlt className="text-primary text-xl mt-1" />
+                <div>
+                  <p className="font-semibold">Address</p>
+                  <p className="text-gray-600">
+                    123 Tech Street
+                    <br />
+                    Suite 100
+                    <br />
+                    City, State 12345
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <FaClock className="text-primary text-xl mt-1" />
+                <div>
+                  <p className="font-semibold">Business Hours</p>
+                  <p className="text-gray-600">
+                    Monday - Friday: 9AM - 6PM
+                    <br />
+                    Saturday: 10AM - 4PM
+                    <br />
+                    Sunday: Closed
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-primary text-primary-content">
+          <div className="card-body">
+            <h3 className="card-title">Emergency Service</h3>
+            <p>Need immediate assistance? Call our emergency line:</p>
+            <p className="text-2xl font-bold">(555) 123-EMERGENCY</p>
+            <p className="text-sm">
+              Available 24/7 for critical business systems
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Form */}
+      <div className="lg:col-span-2">
+        <div className="card bg-base-100 shadow-lg">
+          <div className="card-body">
+            <h2 className="card-title text-2xl mb-6">Send us a Message</h2>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">First Name *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered"
+                    {...register("firstName", {
+                      required: "First name is required",
+                    })}
+                  />
+                  {errors.firstName && (
+                    <span className="text-error text-sm mt-1">
+                      {errors.firstName.message}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Last Name *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered"
+                    {...register("lastName", {
+                      required: "Last name is required",
+                    })}
+                  />
+                  {errors.lastName && (
+                    <span className="text-error text-sm mt-1">
+                      {errors.lastName.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Email *</span>
+                  </label>
+                  <input
+                    type="email"
+                    className="input input-bordered"
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
+                  />
+                  {errors.email && (
+                    <span className="text-error text-sm mt-1">
+                      {errors.email.message}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Phone</span>
+                  </label>
+                  <input
+                    type="tel"
+                    className="input input-bordered"
+                    {...register("phone")}
+                  />
+                </div>
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Subject *</span>
+                </label>
+                <select
+                  className="select select-bordered"
+                  {...register("subject", {
+                    required: "Please select a subject",
+                  })}
+                >
+                  <option value="">Select a subject</option>
+                  <option value="general">General Inquiry</option>
+                  <option value="support">Technical Support</option>
+                  <option value="billing">Billing Question</option>
+                  <option value="feedback">Feedback</option>
+                  <option value="other">Other</option>
+                </select>
+                {errors.subject && (
+                  <span className="text-error text-sm mt-1">
+                    {errors.subject.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Message *</span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered h-32"
+                  placeholder="Please describe your inquiry..."
+                  {...register("message", {
+                    required: "Message is required",
+                    minLength: {
+                      value: 10,
+                      message: "Please provide more details",
+                    },
+                  })}
+                />
+                {errors.message && (
+                  <span className="text-error text-sm mt-1">
+                    {errors.message.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-control mt-8">
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-lg"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="loading loading-spinner"></span>
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default ContactForm;
