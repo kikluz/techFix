@@ -56,6 +56,8 @@ const services = [
 ];
 
 const ServicesGrid = () => {
+  // ? Show only first 3 services for preview
+  const displayedServices = services.slice(0, 3);
   return (
     <section className="py-16">
       <div className="text-center mb-12">
@@ -66,7 +68,7 @@ const ServicesGrid = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {services.map((servise) => {
+        {displayedServices.map((servise) => {
           return (
             <div
               key={servise.id}
