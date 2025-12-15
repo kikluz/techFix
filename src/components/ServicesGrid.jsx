@@ -13,7 +13,7 @@ import {
 const services = [
   {
     id: 1,
-    icon: <FaLaptop />,
+    icon: <FaLaptop className="text-4xl text-primary" />,
     title: "Laptop Repair",
     description: "Screen replacement, keyboard fixes, battery issues, and more",
     price: "From $79",

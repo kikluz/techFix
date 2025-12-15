@@ -13,7 +13,7 @@ const Footer = () => {
   return (
     <footer className="bg-base-300 text-base-content">
       <div className="align-element py-12 pr-2 pl-2 ">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2 text-xl font-bold">
@@ -70,31 +70,6 @@ const Footer = () => {
                 <Link to="/contact" className="link link-hover">
                   Contact
                 </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Our Services</h3>
-            <ul className="space-y-2">
-              <li>
-                <a className="link link-hover">Laptop Repair</a>
-              </li>
-              <li>
-                <a className="link link-hover">Desktop Repair</a>
-              </li>
-              <li>
-                <a className="link link-hover">Virus Removal</a>
-              </li>
-              <li>
-                <a className="link link-hover">Data Recovery</a>
-              </li>
-              <li>
-                <a className="link link-hover">Network Setup</a>
-              </li>
-              <li>
-                <a className="link link-hover">Device Setup</a>
               </li>
             </ul>
           </div>
