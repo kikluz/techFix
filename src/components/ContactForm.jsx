@@ -74,17 +74,6 @@ const ContactForm = () => {
             </div>
           </div>
         </div>
-
-        <div className="card bg-primary text-primary-content">
-          <div className="card-body">
-            <h3 className="card-title">Emergency Service</h3>
-            <p>Need immediate assistance? Call our emergency line:</p>
-            <p className="text-2xl font-bold">(555) 123-EMERGENCY</p>
-            <p className="text-sm">
-              Available 24/7 for critical business systems
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Contact Form */}
