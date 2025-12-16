@@ -1,22 +1,58 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaPhone, FaMapMarkerAlt, FaClock, FaEnvelope } from "react-icons/fa";
-
+import emailjs from "@emailjs/browser";
 const ContactForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset, // Added to clear the form
   } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({
+    success: false,
+    message: "",
+  }); // For better feedback
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Contact form data:", data);
-    setIsSubmitting(false);
-    alert("Thank you for your message! We'll get back to you within 24 hours.");
+    setSubmitStatus({ success: false, message: "" });
+
+    // Prepare the template parameters for EmailJS
+    const templateParams = {
+      from_name: `${data.firstName} ${data.lastName}`,
+      from_email: data.email,
+      phone: data.phone || "Not provided",
+      subject: data.subject,
+      message: data.message,
+      to_name: "TechFix Pro", // Your business name
+    };
+
+    try {
+      // Send the email using EmailJS
+      await emailjs.send(
+        "service_nglyr74", // Replace with your EmailJS Service ID
+        "template_7dxj93o", // Replace with your EmailJS Template ID
+        templateParams,
+        "mLQFXLy6ehkjH1sc3" // Replace with your EmailJS Public Key
+      );
+
+      console.log("Email sent successfully!");
+      setSubmitStatus({
+        success: true,
+        message: "Thank you! Your message has been sent successfully.",
+      });
+      reset(); // Clear all form fields
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      setSubmitStatus({
+        success: false,
+        message: "Oops! Something went wrong. Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -217,6 +253,16 @@ const ContactForm = () => {
                     "Send Message"
                   )}
                 </button>
+                {/* Add a status message area */}
+                {submitStatus.message && (
+                  <div
+                    className={`mt-4 text-center ${
+                      submitStatus.success ? "text-success" : "text-error"
+                    }`}
+                  >
+                    {submitStatus.message}
+                  </div>
+                )}
               </div>
             </form>
           </div>
