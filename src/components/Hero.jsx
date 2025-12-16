@@ -16,9 +16,10 @@ const Hero = () => {
           <div className="max-w-2xl">
             <h1 className="text-5xl font-bold">Professional Computer Repair</h1>
             <p className="py-6 text-lg">
-              Fast, reliable, and affordable computer repair services. We fix
-              laptops, desktops, and all your tech needs with guaranteed quality
-              and quick turnaround.
+              Our mission at Novatech is simple: to deliver exceptional repair
+              services with a focus on quality, reliability, and customer
+              satisfaction, and maintaining transparent communication every step
+              of the way.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/book-repair" className="btn btn-primary btn-lg">

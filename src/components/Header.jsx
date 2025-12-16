@@ -1,5 +1,5 @@
 import React from "react";
-import { FaPhone, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaPhone, FaComment, FaClock, FaMapMarkerAlt } from "react-icons/fa";
 
 // ? Create a header and navigation.
 const Header = () => {
@@ -9,16 +9,18 @@ const Header = () => {
         <div className="flex items-center gap-4 mb-2 sm:mb-0">
           <div className="flex items-center gap-1">
             <FaPhone className="text-sm" />
-            <span> (555) 123-TECH</span>
+            <span> 1(415)215-57-40</span>
           </div>
           <div className="flex items-center gap-1">
             <FaMapMarkerAlt className="text-xs" />
-            <span>123 Tech Street, City</span>
+            <span>
+              88 Belvedere st. suite 209 Second Floor San Rafael CA 94901
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <FaClock className="text-xs" />
-          <span>Mon-Fri: 9AM-6PM | Sat: 10AM-4PM</span>
+          <FaComment className="text-xs" />
+          <span>Se Habla Español </span>
         </div>
       </div>
     </header>

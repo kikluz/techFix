@@ -11,7 +11,7 @@ const Navbar = () => {
           {/* logo */}
           <NavLink to="/" className="flex items-center gap-2 text-xl font-bold">
             <FaWrench className="text-2xl text-primary" />
-            <span>TechFix Pro</span>
+            <span>Novatech</span>
           </NavLink>
           {/* mobil dropdown  */}
           <div className="dropdown">
