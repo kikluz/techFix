@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { FaPhone, FaMapMarkerAlt, FaClock, FaEnvelope } from "react-icons/fa";
+import {
+  FaPhone,
+  FaMapMarkerAlt,
+  FaClock,
+  FaEnvelope,
+  FaExclamationTriangle,
+  FaCheckCircle,
+} from "react-icons/fa";
 import emailjs from "@emailjs/browser";
 
 const ContactForm = () => {
@@ -8,68 +15,97 @@ const ContactForm = () => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    reset, // Added to clear the form
+    reset,
+    watch,
   } = useForm({ mode: "onChange" });
-  // ? State to manage submission status
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({
     success: false,
     message: "",
-  }); // For better feedback
+  });
 
-  // Load environment variables (secured)
-  const EMAILJS_PUBLIC_KEY = import.meta.env.EMAILJS_PUBLIC_KEY;
-  const EMAILJS_SERVICE_ID = import.meta.env.EMAILJS_SERVICE_ID;
-  const EMAILJS_TEMPLATE_ID = import.meta.env.EMAILJS_TEMPLATE_ID;
+  const [isConfigured, setIsConfigured] = useState(false);
 
-  // ? Initialize EmailJS with emvironment variables
+  // CORRECTED: Use consistent environment variable names
+  // All Vite environment variables must start with VITE_
+  const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+
+  // Watch message for character count
+  const messageValue = watch("message", "");
+
+  // Initialize EmailJS and check configuration
   useEffect(() => {
-    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
-  }, []);
+    if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+      setIsConfigured(true);
+      console.log("✅ EmailJS configured successfully");
+    } else {
+      console.warn("⚠️ EmailJS not configured. Missing environment variables.");
+      console.log({
+        hasPublicKey: !!EMAILJS_PUBLIC_KEY,
+        hasServiceId: !!EMAILJS_SERVICE_ID,
+        hasTemplateId: !!EMAILJS_TEMPLATE_ID,
+      });
+    }
+  }, [EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]);
 
   const onSubmit = async (data) => {
-    // ? CHeck if Emails is configured
-    if (!EMAILJS_PUBLIC_KEY || !SERVICE_ID || !TEMPLATE_ID) {
+    // Check if EmailJS is configured - CORRECTED variable names
+    if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID) {
       setSubmitStatus({
         success: false,
         message:
-          "Email service is not configured properly. Please contact support.",
+          "Email service is not configured. Please check environment variables.",
       });
       return;
     }
-    // ? Reset status and set submitting state
+
     setIsSubmitting(true);
     setSubmitStatus({ success: false, message: "" });
 
-    // Prepare the template parameters for EmailJS
     const templateParams = {
       from_name: `${data.firstName} ${data.lastName}`,
       from_email: data.email,
       phone: data.phone || "Not provided",
       subject: data.subject,
       message: data.message,
-      to_name: "TechFix Pro", // Your business name
+      to_name: "TechFix Pro",
+      timestamp: new Date().toISOString(),
     };
 
     try {
-      // Send the email using EmailJS
+      // CORRECTED: Use the actual variable names
       const result = await emailjs.send(
-        SERVICE_ID,
-        TEMPLATE_ID,
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
         templateParams
       );
 
-      console.log("Email sent successfully!");
+      console.log("✅ Email sent successfully:", result);
       setSubmitStatus({
         success: true,
         message: "Thank you! Your message has been sent successfully.",
       });
-      reset(); // Clear all form fields
+      reset();
     } catch (error) {
-      console.error("Failed to send email:", error);
+      console.error("❌ Failed to send email:", error);
+
+      let errorMessage = "Oops! Something went wrong. Please try again later.";
+
+      // Provide specific error messages
+      if (error.status === 412) {
+        errorMessage =
+          "EmailJS authentication error. Please check Gmail connection.";
+      } else if (error.status === 400) {
+        errorMessage = "Invalid template or service configuration.";
+      }
+
       setSubmitStatus({
         success: false,
-        message: "Oops! Something went wrong. Please try again later.",
+        message: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
@@ -129,6 +165,21 @@ const ContactForm = () => {
                 </div>
               </div>
             </div>
+
+            {/* Configuration Status */}
+            <div className="mt-6 p-4 bg-base-200 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium">Email Service Status</span>
+                <span
+                  className={`badge ${
+                    isConfigured ? "badge-success" : "badge-warning"
+                  }`}
+                >
+                  {isConfigured ? "Active" : "Not Configured"}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">Powered by EmailJS</p>
+            </div>
           </div>
         </div>
       </div>
@@ -139,6 +190,46 @@ const ContactForm = () => {
           <div className="card-body">
             <h2 className="card-title text-2xl mb-6">Send us a Message</h2>
 
+            {/* Configuration Warning */}
+            {!isConfigured && (
+              <div className="alert alert-warning mb-6">
+                <FaExclamationTriangle />
+                <div>
+                  <h3 className="font-bold">EmailJS Not Configured</h3>
+                  <div className="text-sm">
+                    <p>
+                      Create a <code>.env</code> file in your project root with:
+                    </p>
+                    <pre className="mt-2 p-2 bg-base-300 rounded text-xs">
+                      VITE_EMAILJS_PUBLIC_KEY=your_public_key_here
+                      <br />
+                      VITE_EMAILJS_SERVICE_ID=your_service_id_here
+                      <br />
+                      VITE_EMAILJS_TEMPLATE_ID=your_template_id_here
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Status Message */}
+            {submitStatus.message && (
+              <div
+                className={`alert ${
+                  submitStatus.success ? "alert-success" : "alert-error"
+                } mb-6`}
+              >
+                <div className="flex items-center gap-2">
+                  {submitStatus.success ? (
+                    <FaCheckCircle className="text-xl" />
+                  ) : (
+                    <FaExclamationTriangle className="text-xl" />
+                  )}
+                  <span>{submitStatus.message}</span>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="form-control">
@@ -147,13 +238,20 @@ const ContactForm = () => {
                   </label>
                   <input
                     type="text"
-                    className="input input-bordered"
+                    className={`input input-bordered ${
+                      errors.firstName ? "input-error" : ""
+                    }`}
                     {...register("firstName", {
                       required: "First name is required",
+                      minLength: {
+                        value: 2,
+                        message: "Minimum 2 characters",
+                      },
                     })}
                   />
                   {errors.firstName && (
-                    <span className="text-error text-sm mt-1">
+                    <span className="text-error text-sm mt-1 flex items-center gap-1">
+                      <FaExclamationTriangle className="text-xs" />
                       {errors.firstName.message}
                     </span>
                   )}
@@ -165,13 +263,20 @@ const ContactForm = () => {
                   </label>
                   <input
                     type="text"
-                    className="input input-bordered"
+                    className={`input input-bordered ${
+                      errors.lastName ? "input-error" : ""
+                    }`}
                     {...register("lastName", {
                       required: "Last name is required",
+                      minLength: {
+                        value: 2,
+                        message: "Minimum 2 characters",
+                      },
                     })}
                   />
                   {errors.lastName && (
-                    <span className="text-error text-sm mt-1">
+                    <span className="text-error text-sm mt-1 flex items-center gap-1">
+                      <FaExclamationTriangle className="text-xs" />
                       {errors.lastName.message}
                     </span>
                   )}
@@ -185,17 +290,20 @@ const ContactForm = () => {
                   </label>
                   <input
                     type="email"
-                    className="input input-bordered"
+                    className={`input input-bordered ${
+                      errors.email ? "input-error" : ""
+                    }`}
                     {...register("email", {
                       required: "Email is required",
                       pattern: {
-                        value: /^\S+@\S+$/i,
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
                         message: "Invalid email address",
                       },
                     })}
                   />
                   {errors.email && (
-                    <span className="text-error text-sm mt-1">
+                    <span className="text-error text-sm mt-1 flex items-center gap-1">
+                      <FaExclamationTriangle className="text-xs" />
                       {errors.email.message}
                     </span>
                   )}
@@ -210,6 +318,11 @@ const ContactForm = () => {
                     className="input input-bordered"
                     {...register("phone")}
                   />
+                  <label className="label">
+                    <span className="label-text-alt text-gray-500">
+                      Optional
+                    </span>
+                  </label>
                 </div>
               </div>
 
@@ -218,7 +331,9 @@ const ContactForm = () => {
                   <span className="label-text">Subject *</span>
                 </label>
                 <select
-                  className="select select-bordered"
+                  className={`select select-bordered ${
+                    errors.subject ? "select-error" : ""
+                  }`}
                   {...register("subject", {
                     required: "Please select a subject",
                   })}
@@ -231,7 +346,8 @@ const ContactForm = () => {
                   <option value="other">Other</option>
                 </select>
                 {errors.subject && (
-                  <span className="text-error text-sm mt-1">
+                  <span className="text-error text-sm mt-1 flex items-center gap-1">
+                    <FaExclamationTriangle className="text-xs" />
                     {errors.subject.message}
                   </span>
                 )}
@@ -242,52 +358,53 @@ const ContactForm = () => {
                   <span className="label-text">Message *</span>
                 </label>
                 <textarea
-                  className="textarea textarea-bordered h-32"
+                  className={`textarea textarea-bordered h-32 ${
+                    errors.message ? "textarea-error" : ""
+                  }`}
                   placeholder="Please describe your inquiry..."
-                  maxLength={1000}
-                  aria-invalid={errors.message ? "true" : "false"}
                   {...register("message", {
                     required: "Message is required",
                     minLength: {
                       value: 10,
-                      message: "Please provide more details",
+                      message:
+                        "Please provide more details (minimum 10 characters)",
+                    },
+                    maxLength: {
+                      value: 1000,
+                      message: "Message too long (maximum 1000 characters)",
                     },
                   })}
                 />
                 {errors.message && (
-                  <span className="text-error text-sm mt-1">
+                  <span className="text-error text-sm mt-1 flex items-center gap-1">
+                    <FaExclamationTriangle className="text-xs" />
                     {errors.message.message}
                   </span>
                 )}
+                <label className="label">
+                  <span className="label-text-alt text-gray-500">
+                    {messageValue.length}/1000 characters
+                  </span>
+                </label>
               </div>
 
               <div className="form-control mt-8">
                 <button
                   type="submit"
                   className="btn btn-primary btn-lg"
-                  disabled={isSubmitting || !isValid}
+                  disabled={isSubmitting || !isValid || !isConfigured}
                 >
                   {isSubmitting ? (
                     <>
                       <span className="loading loading-spinner"></span>
                       Sending...
                     </>
+                  ) : !isConfigured ? (
+                    "Configure EmailJS First"
                   ) : (
                     "Send Message"
                   )}
                 </button>
-                {/* Add a status message area */}
-                {submitStatus.message && (
-                  <div
-                    role="status"
-                    aria-live="polite"
-                    className={`mt-4 text-center ${
-                      submitStatus.success ? "text-success" : "text-error"
-                    }`}
-                  >
-                    {submitStatus.message}
-                  </div>
-                )}
               </div>
             </form>
           </div>
@@ -296,4 +413,5 @@ const ContactForm = () => {
     </div>
   );
 };
+
 export default ContactForm;
