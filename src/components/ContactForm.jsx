@@ -1,21 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaPhone, FaMapMarkerAlt, FaClock, FaEnvelope } from "react-icons/fa";
 import emailjs from "@emailjs/browser";
+
 const ContactForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     reset, // Added to clear the form
-  } = useForm();
+  } = useForm({ mode: "onChange" });
+  // ? State to manage submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({
     success: false,
     message: "",
   }); // For better feedback
 
+  // Load environment variables (secured)
+  const EMAILJS_PUBLIC_KEY = import.meta.env.EMAILJS_PUBLIC_KEY;
+  const EMAILJS_SERVICE_ID = import.meta.env.EMAILJS_SERVICE_ID;
+  const EMAILJS_TEMPLATE_ID = import.meta.env.EMAILJS_TEMPLATE_ID;
+
+  // ? Initialize EmailJS with emvironment variables
+  useEffect(() => {
+    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+  }, []);
+
   const onSubmit = async (data) => {
+    // ? CHeck if Emails is configured
+    if (!EMAILJS_PUBLIC_KEY || !SERVICE_ID || !TEMPLATE_ID) {
+      setSubmitStatus({
+        success: false,
+        message:
+          "Email service is not configured properly. Please contact support.",
+      });
+      return;
+    }
+    // ? Reset status and set submitting state
     setIsSubmitting(true);
     setSubmitStatus({ success: false, message: "" });
 
@@ -31,11 +53,10 @@ const ContactForm = () => {
 
     try {
       // Send the email using EmailJS
-      await emailjs.send(
-        "service_nglyr74", // Replace with your EmailJS Service ID
-        "template_7dxj93o", // Replace with your EmailJS Template ID
-        templateParams,
-        "mLQFXLy6ehkjH1sc3" // Replace with your EmailJS Public Key
+      const result = await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        templateParams
       );
 
       console.log("Email sent successfully!");
@@ -223,6 +244,8 @@ const ContactForm = () => {
                 <textarea
                   className="textarea textarea-bordered h-32"
                   placeholder="Please describe your inquiry..."
+                  maxLength={1000}
+                  aria-invalid={errors.message ? "true" : "false"}
                   {...register("message", {
                     required: "Message is required",
                     minLength: {
@@ -242,7 +265,7 @@ const ContactForm = () => {
                 <button
                   type="submit"
                   className="btn btn-primary btn-lg"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                 >
                   {isSubmitting ? (
                     <>
@@ -256,6 +279,8 @@ const ContactForm = () => {
                 {/* Add a status message area */}
                 {submitStatus.message && (
                   <div
+                    role="status"
+                    aria-live="polite"
                     className={`mt-4 text-center ${
                       submitStatus.success ? "text-success" : "text-error"
                     }`}
